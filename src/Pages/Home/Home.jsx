@@ -1,31 +1,63 @@
 import React, { useState } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import { motion } from 'framer-motion';
+import JoditEditor from "jodit-react";
 
 const Home = () => {
-    const [editorHtml, setEditorHtml] = useState('');
+    const [title, setTitle] = useState('');
+    const [thumbnail, setThumbnail] = useState('');
+    const [content, setContent] = useState('');
 
-    const handleChange = (html) => {
-        setEditorHtml(html);
+    const handleChange = (value) => {
+        setContent(value);
+    };
+
+    const handleTitleChange = (e) => {
+        setTitle(e.target.value);
+    };
+
+    const handleThumbnailChange = (e) => {
+        setThumbnail(e.target.value);
+    };
+
+    const handleImageUpload = (file) => {
+        setThumbnail(file.url);
     };
 
     return (
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-        >
-            <div className="container mx-auto p-4">
-                <h2 className="text-3xl font-bold mb-4">Welcome to Opedia Blogs</h2>
-                <p className="text-lg mb-4">Share your thoughts, stories, and ideas with the world. Start writing your first blog post now!</p>
-                <ReactQuill 
-                    theme="snow" 
-                    value={editorHtml}
-                    onChange={handleChange} 
+        <div className="px-4 py-8">
+            <h2 className="text-3xl font-bold mb-4">Welcome to Opedia Blogs</h2>
+            <div className="mb-4">
+                <label htmlFor="title" className="block text-sm font-semibold text-gray-600">Title</label>
+                <input
+                    type="text"
+                    id="title"
+                    value={title}
+                    onChange={handleTitleChange}
+                    placeholder="Enter the title"
+                    className="border border-gray-300 p-2 w-full"
                 />
             </div>
-        </motion.div>
+            <div className="mb-4">
+                <label htmlFor="thumbnail" className="block text-sm font-semibold text-gray-600">Thumbnail Image</label>
+                <input
+                    type="file"
+                    accept="image/*"
+                    id="thumbnail"
+                    onChange={(e) => handleThumbnailChange(e.target.files[0])}
+                    className="border border-gray-300 p-2 w-full"
+                />
+            </div>
+            <JoditEditor
+                value={content}
+                onChange={handleChange}
+                config={{
+                    uploader: {
+                        insertImageAsBase64URI: true,
+                        imagesExtensions: ["jpg", "png", "jpeg", "gif"],
+                        process: handleImageUpload,
+                    },
+                }}
+            />
+        </div>
     );
 };
 
