@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import JoditEditor from "jodit-react";
+import { AuthContext } from "../../providers/AuthProvider";
 
 const Home = () => {
+    const { user } = useContext(AuthContext);
     const [title, setTitle] = useState('');
     const [thumbnail, setThumbnail] = useState('');
     const [content, setContent] = useState('');
@@ -24,9 +26,10 @@ const Home = () => {
 
     return (
         <div className="px-4 py-8">
+            {user && <p className="text-sm font-semibold text-gray-600">*Logged in as {user.email}*</p>} 
             <h2 className="text-3xl font-bold mb-4">Welcome to Opedia Blogs</h2>
             <div className="mb-4">
-                <label htmlFor="title" className="block text-sm font-semibold text-gray-600">Title</label>
+                <label htmlFor="title" className="block text-xl font-semibold text-gray-600">Title</label>
                 <input
                     type="text"
                     id="title"
@@ -37,7 +40,7 @@ const Home = () => {
                 />
             </div>
             <div className="mb-4">
-                <label htmlFor="thumbnail" className="block text-sm font-semibold text-gray-600">Thumbnail Image</label>
+                <label htmlFor="thumbnail" className="block text-xl font-semibold text-gray-600">Thumbnail Image</label>
                 <input
                     type="file"
                     accept="image/*"

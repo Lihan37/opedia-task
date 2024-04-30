@@ -1,14 +1,50 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { AuthContext } from "../../providers/AuthProvider";
+import Swal from "sweetalert2";
 
 const Login = () => {
+    const { signIn } = useContext(AuthContext);
+
+    const handleSignIn = async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const email = form.email.value;
+        const password = form.password.value;
+
+        try {
+            await signIn(email, password);
+            // Display success alert
+            Swal.fire({
+                title: 'Success!',
+                text: 'You have successfully logged in.',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500 // Close alert after 1.5 seconds
+            }).then(() => {
+                // Redirect user to "/"
+                window.location.href = "/";
+            });
+        } catch (error) {
+            // Handle sign-in error
+            console.error('Error signing in:', error);
+            // Display error alert
+            Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred while signing in. Please try again later.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full">
                 <div>
                     <h2 className="mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900">Sign in to your account</h2>
                 </div>
-                <form className="mt-8">
+                <form className="mt-8" onSubmit={handleSignIn}>
                     <div className="rounded-md shadow-sm">
                         <div>
                             <input aria-label="Email address" name="email" type="email" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 sm:text-sm sm:leading-5" placeholder="Email address" />
