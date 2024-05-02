@@ -16,7 +16,7 @@ const Register = () => {
       await createUser(email, password);
 
       // If user creation is successful, register user in MongoDB
-      const response = await axios.post("http://localhost:5000/users", {
+      const response = await axios.post("https://opedia-server.vercel.app/users", {
         name,
         email,
         password,

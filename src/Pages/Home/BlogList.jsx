@@ -1,23 +1,54 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import axios from "axios";
 import Swal from "sweetalert2";
 import { AuthContext } from "../../providers/AuthProvider";
+import CommentForm from "../CommentForm/CommentForm";
 
-const BlogList = ({ blogs, loading, handleDelete }) => {
+const BlogList = ({ blogs, loading, handleDeleteBlog, handleEditBlog, handleDeleteComment, handleEditComment }) => {
   const { user } = useContext(AuthContext);
   const [showFullContent, setShowFullContent] = useState(false);
+  const [comments, setComments] = useState({});
+
+  // useEffect(() => {
+  //   fetchComments();
+  // }, [blogs]); 
+  // const fetchComments = async () => {
+  //   try {
+  //     const commentData = await Promise.all(
+  //       blogs.map(async (blog) => {
+  //         const response = await axios.get(
+  //           `https://opedia-server.vercel.app/blogs/${blog._id}/comments`
+  //         );
+  //         return { blogId: blog._id, comments: response.data.comments };
+  //       })
+  //     );
+
+  //     const commentsObj = {};
+  //     commentData.forEach((item) => {
+  //       commentsObj[item.blogId] = item.comments;
+  //     });
+  //     setComments(commentsObj);
+  //   } catch (error) {
+  //     console.error("Error fetching comments:", error);
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Oops...",
+  //       text: "Failed to fetch comments. Please try again later.",
+  //     });
+  //   }
+  // };
 
   const toggleContent = () => {
     setShowFullContent(!showFullContent);
   };
 
-  const handleEdit = (blogId) => {
-    // Implement edit functionality
-    console.log("Editing blog with ID:", blogId);
+  const handleBlogEdit = (blogId) => {
+    handleEditBlog(blogId);
   };
 
-  const handleDeleteClick = async (blogId) => {
+  const handleBlogDelete = async (blogId) => {
     try {
-      await handleDelete(blogId); // Call the handleDelete function passed as prop
+      await handleDeleteBlog(blogId);
       console.log("Blog deleted successfully:", blogId);
     } catch (error) {
       console.error("Error deleting blog:", error);
@@ -27,6 +58,26 @@ const BlogList = ({ blogs, loading, handleDelete }) => {
         text:
           error.response.data.error ||
           "Failed to delete blog. Please try again later.",
+      });
+    }
+  };
+
+  const handleCommentEdit = (commentId) => {
+    handleEditComment(commentId);
+  };
+
+  const handleCommentDelete = async (commentId) => {
+    try {
+      await handleDeleteComment(commentId);
+      console.log("Comment deleted successfully:", commentId);
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text:
+          error.response.data.error ||
+          "Failed to delete comment. Please try again later.",
       });
     }
   };
@@ -71,24 +122,59 @@ const BlogList = ({ blogs, loading, handleDelete }) => {
                     {showFullContent ? "Show less" : "Show more"}
                   </button>
                 )}
-                {/* Edit and Delete Buttons */}
-                {user && user.email === blog.authorEmail && (
-                  <>
-                    <button
-                      onClick={() => handleEdit(blog._id)}
-                      className="ml-2 text-green-500 hover:underline"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(blog._id)}
-                      className="ml-2 text-red-500 hover:underline"
-                    >
-                      Delete
-                    </button>
-                  </>
+              </div>
+              {/* Comment Section */}
+              <div className="mt-4">
+                <h4 className="text-lg font-semibold mb-2">Comments:</h4>
+                {comments[blog._id] && comments[blog._id].length > 0 ? (
+                  comments[blog._id].map((comment) => (
+                    <div key={comment._id} className="mb-2">
+                      <p>{comment.content}</p>
+                      <p className="text-gray-600 text-sm">
+                        Comment by: {comment.authorEmail}
+                      </p>
+                      {user && user.email === comment.authorEmail && (
+                        <div className="flex mt-1">
+                          <button
+                            onClick={() => handleCommentEdit(comment._id)}
+                            className="text-green-500 hover:underline mr-2"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleCommentDelete(comment._id)}
+                            className="text-red-500 hover:underline"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p>No comments yet.</p>
+                )}
+                {user && (
+                  <CommentForm blogId={blog._id} />
                 )}
               </div>
+              {/* Edit and Delete Buttons for Blogs */}
+              {user && user.email === blog.authorEmail && (
+                <div className="flex mt-4">
+                  <button
+                    onClick={() => handleBlogEdit(blog._id)}
+                    className="text-green-500 hover:underline mr-2"
+                  >
+                    Edit Blog
+                  </button>
+                  <button
+                    onClick={() => handleBlogDelete(blog._id)}
+                    className="text-red-500 hover:underline"
+                  >
+                    Delete Blog
+                  </button>
+                </div>
+              )}
             </div>
           ))
         ) : (

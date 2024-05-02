@@ -1,3 +1,5 @@
+// Home.js
+
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import ReactQuill from "react-quill";
@@ -15,18 +17,33 @@ const Home = () => {
   const [blogs, setBlogs] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1); // Current page number
-  const [totalPages, setTotalPages] = useState(1); // Total number of pages
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchBlogs(currentPage);
-  }, [currentPage]); // Fetch blogs when currentPage changes
+  }, [currentPage]);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    const results = blogs.filter(
+      (blog) =>
+        blog.title.toLowerCase().includes(query) ||
+        blog.content.toLowerCase().includes(query)
+    );
+    setSearchResults(results);
+  }, [searchQuery, blogs]);
 
   const fetchBlogs = async (page) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:5000/blogs?page=${page}`
+        `https://opedia-server.vercel.app/blogs?page=${page}`
       );
       setBlogs(response.data.blogs);
       setTotalPages(response.data.totalPages);
@@ -53,22 +70,16 @@ const Home = () => {
     setSearchQuery(e.target.value);
   };
 
-  const handleSearch = () => {
-    console.log("Searching...");
-
-    if (!searchQuery.trim()) {
-      // Empty search query
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(
+        `https://opedia-server.vercel.app/blogs?searchQuery=${searchQuery}`
+      );
+      setSearchResults(response.data.blogs);
+    } catch (error) {
+      console.error("Error searching blogs:", error);
       setSearchResults([]);
-      return;
     }
-
-    const query = searchQuery.toLowerCase().trim();
-    const results = blogs.filter(
-      (blog) =>
-        blog.title.toLowerCase().includes(query) ||
-        blog.content.toLowerCase().includes(query)
-    );
-    setSearchResults(results);
   };
 
   const handlePost = async () => {
@@ -91,19 +102,17 @@ const Home = () => {
       const imgbbResponse = await uploadToImgbb(formData);
       const thumbnailUrl = imgbbResponse.data.data.url;
 
-      await axios.post("http://localhost:5000/blogs", {
+      await axios.post("https://opedia-server.vercel.app/blogs", {
         title,
         content,
         authorEmail: user.email,
         thumbnail: thumbnailUrl,
       });
 
-      // Clear form fields after successful post
       setTitle("");
       setContent("");
       setSelectedFile(null);
 
-      // Fetch blogs after posting
       fetchBlogs(currentPage);
 
       Swal.fire({
@@ -123,9 +132,8 @@ const Home = () => {
 
   const handleDelete = async (blogId) => {
     try {
-      await axios.delete(`http://localhost:5000/blogs/${blogId}`);
+      await axios.delete(`https://opedia-server.vercel.app/blogs/${blogId}`);
       console.log("Blog deleted successfully:", blogId);
-      // Refetch blogs after deletion
       fetchBlogs(currentPage);
     } catch (error) {
       console.error("Error deleting blog:", error);
@@ -240,7 +248,6 @@ const Home = () => {
         loading={loading}
         handleDelete={handleDelete}
       />
-      {/* Pagination */}
       <div className="px-4 py-8 flex justify-center">
         {[...Array(totalPages).keys()].map((page) => (
           <button

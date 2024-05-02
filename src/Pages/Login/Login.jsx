@@ -11,9 +11,14 @@ const Login = () => {
         const form = e.target;
         const email = form.email.value;
         const password = form.password.value;
-
+    
         try {
-            await signIn(email, password);
+            const token = await signIn(email, password); // Assuming signIn returns the access token
+            // Store the token in local storage
+            localStorage.setItem('accessToken', token);
+            // Log the token to the console
+            console.log('Access token stored in local storage:', token);
+    
             // Display success alert
             Swal.fire({
                 title: 'Success!',
@@ -37,6 +42,8 @@ const Login = () => {
             });
         }
     };
+    
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
