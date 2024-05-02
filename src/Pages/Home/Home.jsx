@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
+import axios from "axios";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import axios from "axios";
 import { AuthContext } from "../../providers/AuthProvider";
 import BlogList from "./BlogList";
 import Swal from "sweetalert2";
@@ -15,16 +15,21 @@ const Home = () => {
   const [blogs, setBlogs] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1); // Current page number
+  const [totalPages, setTotalPages] = useState(1); // Total number of pages
 
   useEffect(() => {
-    fetchBlogs();
-  }, []); // Fetch blogs on initial render
+    fetchBlogs(currentPage);
+  }, [currentPage]); // Fetch blogs when currentPage changes
 
-  const fetchBlogs = async () => {
+  const fetchBlogs = async (page) => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:5000/blogs");
-      setBlogs(response.data);
+      const response = await axios.get(
+        `http://localhost:5000/blogs?page=${page}`
+      );
+      setBlogs(response.data.blogs);
+      setTotalPages(response.data.totalPages);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching blogs:", error);
@@ -99,7 +104,7 @@ const Home = () => {
       setSelectedFile(null);
 
       // Fetch blogs after posting
-      fetchBlogs();
+      fetchBlogs(currentPage);
 
       Swal.fire({
         icon: "success",
@@ -115,12 +120,13 @@ const Home = () => {
       });
     }
   };
+
   const handleDelete = async (blogId) => {
     try {
       await axios.delete(`http://localhost:5000/blogs/${blogId}`);
       console.log("Blog deleted successfully:", blogId);
       // Refetch blogs after deletion
-      fetchBlogs();
+      fetchBlogs(currentPage);
     } catch (error) {
       console.error("Error deleting blog:", error);
       Swal.fire({
@@ -141,6 +147,10 @@ const Home = () => {
         },
       }
     );
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -228,8 +238,22 @@ const Home = () => {
       <BlogList
         blogs={searchResults.length > 0 ? searchResults : blogs}
         loading={loading}
-        handleDelete={handleDelete} 
+        handleDelete={handleDelete}
       />
+      {/* Pagination */}
+      <div className="px-4 py-8 flex justify-center">
+        {[...Array(totalPages).keys()].map((page) => (
+          <button
+            key={page + 1}
+            onClick={() => handlePageChange(page + 1)}
+            className={`mx-2 p-2 border ${
+              currentPage === page + 1 ? "bg-blue-500 text-white" : ""
+            }`}
+          >
+            {page + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
