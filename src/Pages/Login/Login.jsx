@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from "../../providers/AuthProvider";
 import Swal from "sweetalert2";
-import axios from 'axios'; // Import axios
+import axios from 'axios'; 
 
 const Login = () => {
     const { signIn } = useContext(AuthContext);

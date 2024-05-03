@@ -19,7 +19,7 @@ const CommentForm = ({ blogId }) => {
       if (!content.trim()) {
         return;
       }
-      // Retrieve access token from local storage
+      
       const token = localStorage.getItem("accessToken");
       console.log("Retrieved access token:", token);
 

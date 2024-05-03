@@ -254,7 +254,7 @@ const Home = () => {
         blogs={searchResults.length > 0 ? searchResults : blogs}
         loading={loading}
         handleDelete={handleDelete}
-        handleEditBlog={handleEditBlog} // Pass handleEditBlog function as a prop
+        handleEditBlog={handleEditBlog} 
       />
       <div className="px-4 py-8 flex justify-center">
         {[...Array(totalPages).keys()].map((page) => (

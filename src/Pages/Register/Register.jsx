@@ -15,35 +15,35 @@ const Register = () => {
     try {
       await createUser(email, password);
 
-      // If user creation is successful, register user in MongoDB
+      
       const response = await axios.post("https://opedia-server.vercel.app/users", {
         name,
         email,
         password,
       });
-      // Handle success response
+      
       console.log("Registration successful:", response.data);
 
-      // Clear form fields
+      
       setName("");
       setEmail("");
       setPassword("");
 
-      // Show success alert
+      
       Swal.fire({
         icon: "success",
         title: "Registration Successful!",
         text: "You have successfully registered.",
       });
     } catch (error) {
-      // Handle error
+      
       console.error("Error registering user:", error);
 
-      // Show error alert with Firebase error message
+      
       Swal.fire({
         icon: "error",
         title: "Registration Failed",
-        text: error.message, // Display Firebase error message
+        text: error.message, 
       });
     }
   };
