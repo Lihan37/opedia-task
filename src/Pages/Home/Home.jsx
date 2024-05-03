@@ -1,5 +1,3 @@
-// Home.js
-
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import ReactQuill from "react-quill";
@@ -7,6 +5,7 @@ import "react-quill/dist/quill.snow.css";
 import { AuthContext } from "../../providers/AuthProvider";
 import BlogList from "./BlogList";
 import Swal from "sweetalert2";
+
 
 const Home = () => {
   const { user } = useContext(AuthContext);
@@ -19,6 +18,7 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  
 
   useEffect(() => {
     fetchBlogs(currentPage);
@@ -145,6 +145,13 @@ const Home = () => {
     }
   };
 
+  const handleEditBlog = (blogId) => {
+    window.location.href = `/blogs/${blogId}/edit`;
+  };  
+  
+  
+  
+
   const uploadToImgbb = async (formData) => {
     return await axios.post(
       "https://api.imgbb.com/1/upload?key=dc995ebdc887c4e73f8c06ef1ffa82b9",
@@ -247,6 +254,7 @@ const Home = () => {
         blogs={searchResults.length > 0 ? searchResults : blogs}
         loading={loading}
         handleDelete={handleDelete}
+        handleEditBlog={handleEditBlog} // Pass handleEditBlog function as a prop
       />
       <div className="px-4 py-8 flex justify-center">
         {[...Array(totalPages).keys()].map((page) => (

@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from "../../providers/AuthProvider";
 import Swal from "sweetalert2";
+import axios from 'axios'; // Import axios
 
 const Login = () => {
     const { signIn } = useContext(AuthContext);
@@ -13,27 +14,37 @@ const Login = () => {
         const password = form.password.value;
     
         try {
-            const token = await signIn(email, password); // Assuming signIn returns the access token
-            // Store the token in local storage
+            
+            const token = await signIn(email, password); 
+            
+            const userInfo = {
+                email: email,
+                
+            };
+
+            
+            await axios.post('https://opedia-server.vercel.app/jwt', userInfo);
+
+            
             localStorage.setItem('accessToken', token);
-            // Log the token to the console
+            
             console.log('Access token stored in local storage:', token);
     
-            // Display success alert
+            
             Swal.fire({
                 title: 'Success!',
                 text: 'You have successfully logged in.',
                 icon: 'success',
                 showConfirmButton: false,
-                timer: 1500 // Close alert after 1.5 seconds
+                timer: 1500 
             }).then(() => {
-                // Redirect user to "/"
+                
                 window.location.href = "/";
             });
         } catch (error) {
-            // Handle sign-in error
+            
             console.error('Error signing in:', error);
-            // Display error alert
+            
             Swal.fire({
                 title: 'Error!',
                 text: 'An error occurred while signing in. Please try again later.',
@@ -43,8 +54,6 @@ const Login = () => {
         }
     };
     
-
-
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full">
